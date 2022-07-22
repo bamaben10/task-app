@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import ListDisplay from './ListDisplay';
+import { useFormik } from 'formik';
 
 const AddTask = () => {
     const [input, setInput] = useState("")
@@ -16,24 +17,45 @@ const AddTask = () => {
         newState.splice(index, 1)
         setList([...newState])
     }
-    
-    // const listDisplay = list.map((task) => {
-    //     return <h2>{task}</h2>
-    // })
 
+    const formik = useFormik({
+        initialValues: {
+            task: '',
+            category: null,
+        },
+
+        onSubmit: (values) => {
+            // if(values.category !== null && values.task !== "") {
+            // // console.log(values);
+            // setList([...list, values]);
+            // formik.handleReset()
+            // } else {
+            //     return
+            // }
+
+            if(values.category === null || values.task === "") return
+            setList([...list, values]);
+            formik.handleReset()
+        }
+    })
+    
     return (
         <div>
             <h1>Add Task</h1>
-            <div className="task-form">
-            <input type="text" value={input} onChange={(e) => setInput(e.target.value)}/>
-            <select onChange={(e) => setCategory(e.target.value)}>
+            <form className="task-form" onSubmit={formik.handleSubmit}>
+            <input type="text" 
+            value={formik.values.task} 
+            name="task"
+            onChange={formik.handleChange}
+            />
+            <select value={formik.values.category} name='category' onChange={formik.handleChange}>
                 <option selected disabled defaultValue>Category</option>
                 <option value="Personal">Personal</option>
                 <option value="Work">Work</option>
                 <option value="Errands">Errands</option>
             </select>
-            <button onClick={handleClick}>Add Task</button>
-            </div>
+            <button type="submit">Add Task</button>
+            </form>
             <ListDisplay list={list} deleteTask={deleteTask} />
         </div>
     )
